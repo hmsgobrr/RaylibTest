@@ -1,30 +1,24 @@
 #include "raylib.h"
 
-#define PHYSAC_IMPLEMENTATION
-#define PHYSAC_NO_THREADS
-#include "physac.h"
-
 int main(void) {
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(screenWidth, screenHeight, "Reylib-Gaem v1.0");
 
     // SetExitKey(0);
 
-    InitPhysics();
-
     Texture2D ship = LoadTexture("res/gfx/Ship.png");
     Texture2D shipPropulsionTex = LoadTexture("res/gfx/ShipPropulsion.png");
 
-    int propulsionFrameWidth = shipPropulsionTex.width / 4;
+    float shipWidth = ship.width * 4;
+    float shipHeight = ship.height * 4;
+
+    int propulsionFrameWidth = shipPropulsionTex.width / 6;
     int propulsionFrameHeight = shipPropulsionTex.height;
     int propulsionMaxFrame = shipPropulsionTex.width / propulsionFrameWidth;
 
-    Vector2 shipPos = { 15, (float)screenHeight / 2 - ship.width / 2 * 7 };
-
-    // PhysicsBody shipPhysicsBody = CreatePhysicsBodyRectangle();
+    Vector2 shipPos = { 20, (float)screenHeight / 2 - shipWidth / 2 };
 
     SetTargetFPS(60);
 
@@ -32,9 +26,6 @@ int main(void) {
     int frame = 0;
 
     while (!WindowShouldClose()) {
-
-        RunPhysicsStep();
-
         timer += GetFrameTime();
 
         if (timer >= 0.1f) {
@@ -63,7 +54,7 @@ int main(void) {
             },
             Rectangle{
                 shipPos.x - ship.width - 6,
-                shipPos.y + ship.height * 4 / 2 - propulsionFrameHeight,
+                shipPos.y + shipHeight / 2 - propulsionFrameHeight,
                 propulsionFrameWidth * 4.5f,
                 propulsionFrameHeight * 4.5f
             },
@@ -74,7 +65,7 @@ int main(void) {
 
         DrawTextureEx(ship, shipPos, 0.0f, 4, RAYWHITE);
 
-        DrawText("move the ship WASD or Arrow Keys", 10, 10, 20, DARKGRAY);
+        DrawText("move the ship with WASD or Arrow Keys", 10, 10, 20, DARKGRAY);
 
         EndDrawing();
     }
