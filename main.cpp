@@ -1,5 +1,10 @@
 #include "raylib.h"
 
+struct Asteroid {
+    Vector2 pos;
+    int texIndex;
+};
+
 int main(void) {
     const int screenWidth = 800;
     const int screenHeight = 450;
@@ -11,14 +16,32 @@ int main(void) {
     Texture2D ship = LoadTexture("res/gfx/Ship.png");
     Texture2D shipPropulsionTex = LoadTexture("res/gfx/ShipPropulsion.png");
 
-    float shipWidth = ship.width * 4;
-    float shipHeight = ship.height * 4;
+    const float shipWidth = ship.width * 4;
+    const float shipHeight = ship.height * 4;
 
-    int propulsionFrameWidth = shipPropulsionTex.width / 6;
-    int propulsionFrameHeight = shipPropulsionTex.height;
-    int propulsionMaxFrame = shipPropulsionTex.width / propulsionFrameWidth;
+    const int propulsionFrameWidth = shipPropulsionTex.width / 6;
+    const int propulsionFrameHeight = shipPropulsionTex.height;
+    const int propulsionMaxFrame = shipPropulsionTex.width / propulsionFrameWidth;
 
-    Vector2 shipPos = { 20, (float)screenHeight / 2 - shipWidth / 2 };
+    Vector2 shipPos = { 50, (float)screenHeight / 2 - shipWidth / 2 };
+
+    const float velocity = 2.5f;
+
+    const Texture2D asteroidTexs[2] = {
+        LoadTexture("res/gfx/asteroid-1.png"),
+        LoadTexture("res/gfx/asteroid-2.png")
+    };
+    const int maxAsteroids = 100;
+    int asteroidsSpeedX = 2;
+
+    Asteroid asteroids[maxAsteroids] = { 0 };
+    for (int i = 0; i < maxAsteroids; i++) {
+        asteroids[i].pos.x = 400 + 280 * i;
+        asteroids[i].pos.y = GetRandomValue(0, screenHeight - 30);
+
+        asteroids[i].texIndex = GetRandomValue(0, 1);
+    }
+
 
     SetTargetFPS(60);
 
@@ -35,10 +58,10 @@ int main(void) {
 
         frame %= propulsionMaxFrame;
 
-        if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) shipPos.x += 2.0f;
-        if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) shipPos.x -= 2.0f;
-        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) shipPos.y -= 2.0f;
-        if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) shipPos.y += 2.0f;
+        if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) shipPos.x += velocity;
+        if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) shipPos.x -= velocity;
+        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) shipPos.y -= velocity;
+        if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) shipPos.y += velocity;
 
         BeginDrawing();
 
@@ -65,6 +88,18 @@ int main(void) {
 
         DrawTextureEx(ship, shipPos, 0.0f, 4, RAYWHITE);
 
+        for (int i = 0; i < maxAsteroids; i++) {
+            asteroids[i].pos.x -= asteroidsSpeedX;
+
+            if (asteroids[i].pos.x < -asteroidTexs[asteroids[i].texIndex].width * 5) {
+                asteroids[i].pos.x = screenWidth + 280 * i;
+                asteroids[i].pos.y = GetRandomValue(0, screenHeight - 30);
+            }
+
+            DrawTextureEx(asteroidTexs[asteroids[i].texIndex], asteroids[i].pos, 0, 5, RAYWHITE);
+        }
+
+
         DrawText("move the ship with WASD or Arrow Keys", 10, 10, 20, DARKGRAY);
 
         EndDrawing();
@@ -72,6 +107,9 @@ int main(void) {
 
     UnloadTexture(ship);
     UnloadTexture(shipPropulsionTex);
+
+    for (int i = 0; i < 2; i++)
+        UnloadTexture(asteroidTexs[i]);
 
     CloseWindow();
 
