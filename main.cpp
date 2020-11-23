@@ -3,6 +3,7 @@
 struct Asteroid {
     Vector2 pos;
     int texIndex;
+    float scale;
 };
 
 int main(void) {
@@ -36,10 +37,10 @@ int main(void) {
 
     Asteroid asteroids[maxAsteroids] = { 0 };
     for (int i = 0; i < maxAsteroids; i++) {
-        asteroids[i].pos.x = 400 + 280 * i;
+        asteroids[i].pos.x = screenWidth + 175 * i;
         asteroids[i].pos.y = GetRandomValue(0, screenHeight - 30);
-
         asteroids[i].texIndex = GetRandomValue(0, 1);
+        asteroids[i].scale = GetRandomValue(2, 5);
     }
 
 
@@ -91,12 +92,14 @@ int main(void) {
         for (int i = 0; i < maxAsteroids; i++) {
             asteroids[i].pos.x -= asteroidsSpeedX;
 
-            if (asteroids[i].pos.x < -asteroidTexs[asteroids[i].texIndex].width * 5) {
-                asteroids[i].pos.x = screenWidth + 280 * i;
+            if (asteroids[i].pos.x < -asteroidTexs[asteroids[i].texIndex].width * asteroids[i].scale) {
+                asteroids[i].pos.x = screenWidth + 175 * i;
                 asteroids[i].pos.y = GetRandomValue(0, screenHeight - 30);
+                asteroids[i].texIndex = GetRandomValue(0, 1);
+                asteroids[i].scale = GetRandomValue(2, 5);
             }
 
-            DrawTextureEx(asteroidTexs[asteroids[i].texIndex], asteroids[i].pos, 0, 5, RAYWHITE);
+            DrawTextureEx(asteroidTexs[asteroids[i].texIndex], asteroids[i].pos, 0, asteroids[i].scale, RAYWHITE);
         }
 
 
