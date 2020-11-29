@@ -4,11 +4,11 @@ struct Asteroid {
     Vector2 pos;
     int texIndex;
     float scale;
+    float speed;
 };
-struct Star {
+// struct Star {
 
-};
-
+// };
 
 int main(void) {
     const int screenWidth = 800;
@@ -34,10 +34,8 @@ int main(void) {
 
     const Texture2D asteroidTexs[2] = {
         LoadTexture("res/gfx/asteroid-1.png"),
-        LoadTexture("res/gfx/asteroid-2.png")
-    };
+        LoadTexture("res/gfx/asteroid-2.png") };
     const int maxAsteroids = 100;
-    int asteroidsSpeedX = 2;
 
     Asteroid asteroids[maxAsteroids] = { 0 };
     for (int i = 0; i < maxAsteroids; i++) {
@@ -45,8 +43,8 @@ int main(void) {
         asteroids[i].pos.y = GetRandomValue(0, screenHeight - 30);
         asteroids[i].texIndex = GetRandomValue(0, 1);
         asteroids[i].scale = GetRandomValue(2, 5);
+        asteroids[i].speed = GetRandomValue(2, 5);
     }
-
 
     SetTargetFPS(60);
 
@@ -94,18 +92,18 @@ int main(void) {
         DrawTextureEx(ship, shipPos, 0.0f, 4, RAYWHITE);
 
         for (int i = 0; i < maxAsteroids; i++) {
-            asteroids[i].pos.x -= asteroidsSpeedX;
+            asteroids[i].pos.x -= asteroids[i].speed;
 
             if (asteroids[i].pos.x < -asteroidTexs[asteroids[i].texIndex].width * asteroids[i].scale) {
                 asteroids[i].pos.x = screenWidth + 175 * i;
                 asteroids[i].pos.y = GetRandomValue(0, screenHeight - 30);
                 asteroids[i].texIndex = GetRandomValue(0, 1);
                 asteroids[i].scale = GetRandomValue(2, 5);
+                asteroids[i].speed = GetRandomValue(2, 5);
             }
 
             DrawTextureEx(asteroidTexs[asteroids[i].texIndex], asteroids[i].pos, 0, asteroids[i].scale, RAYWHITE);
         }
-
 
         DrawText("move the ship with WASD or Arrow Keys", 10, 10, 20, DARKGRAY);
 
