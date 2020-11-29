@@ -5,6 +5,10 @@ struct Asteroid {
     int texIndex;
     float scale;
 };
+struct Star {
+
+};
+
 
 int main(void) {
     const int screenWidth = 800;
