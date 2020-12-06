@@ -6,9 +6,14 @@ struct Asteroid {
     float scale;
     float speed;
 };
-// struct Star {
-
-// };
+struct Star {
+    Vector2 pos;
+    int colorIdx;
+    float scale;
+    float speed;
+    int frame;
+    float timer;
+};
 
 int main(void) {
     const int screenWidth = 800;
@@ -46,20 +51,37 @@ int main(void) {
         asteroids[i].speed = GetRandomValue(2, 5);
     }
 
+    Texture2D starsTex = LoadTexture("res/gfx/stars.png");
+    const int starFrameWidth = starsTex.width / 8;
+    const int starFrameHeight = starsTex.height / 6;
+    const int starMaxFrame = starsTex.width / starFrameWidth;
+    const int maxStars = 100;
+    Star stars[maxStars] = { 0 };
+    for (int i = 0; i < maxStars; i++) {
+        stars[i].pos.x = screenWidth + 175 * i;
+        stars[i].pos.y = GetRandomValue(0, screenHeight - 30);
+        stars[i].colorIdx = GetRandomValue(0, 5);
+        stars[i].scale = GetRandomValue(1, 3);
+        stars[i].speed = GetRandomValue(1, 2);
+        stars[i].frame = GetRandomValue(0, 7);
+        stars[i].timer = 0;
+    }
+
+
     SetTargetFPS(60);
 
     float timer = 0.0f;
-    int frame = 0;
+    int shipPropulsionFrame = 0;
 
     while (!WindowShouldClose()) {
         timer += GetFrameTime();
 
         if (timer >= 0.1f) {
             timer = 0.0f;
-            frame++;
+            shipPropulsionFrame++;
         }
 
-        frame %= propulsionMaxFrame;
+        shipPropulsionFrame %= propulsionMaxFrame;
 
         if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) shipPos.x += velocity;
         if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) shipPos.x -= velocity;
@@ -70,10 +92,53 @@ int main(void) {
 
         ClearBackground(BLACK);
 
+        for (int i = 0; i < maxStars; i++) {
+            stars[i].timer += GetFrameTime();
+
+            if (stars[i].timer >= 0.1f) {
+                stars[i].timer = 0;
+                stars[i].frame++;
+            }
+
+            stars[i].frame %= starMaxFrame;
+
+            stars[i].pos.x -= stars[i].speed;
+
+            if (stars[i].pos.x < -starFrameWidth * stars[i].scale) {
+                stars[i].pos.x = screenWidth + 175 * i;
+                stars[i].pos.y = GetRandomValue(0, screenHeight - 30);
+                stars[i].colorIdx = GetRandomValue(0, 5);
+                stars[i].scale = GetRandomValue(1, 3);
+                stars[i].speed = GetRandomValue(1, 2);
+                stars[i].frame = GetRandomValue(0, 7);
+                stars[i].timer = 0;
+            }
+
+            DrawTexturePro(
+                starsTex,
+                Rectangle{
+                    (float)(starFrameWidth * stars[i].frame),
+                    (float)(starFrameHeight * stars[i].colorIdx),
+                    (float)starFrameWidth,
+                    (float)starFrameHeight
+                },
+                Rectangle{
+                    stars[i].pos.x,
+                    stars[i].pos.y,
+                    starFrameWidth * stars[i].scale,
+                    starFrameHeight * stars[i].scale
+                },
+                Vector2{ (float)starFrameWidth, (float)starFrameHeight },
+                0,
+                RAYWHITE
+            );
+        }
+
+
         DrawTexturePro(
             shipPropulsionTex,
             Rectangle{
-                (float)(propulsionFrameWidth * frame),
+                (float)(propulsionFrameWidth * shipPropulsionFrame),
                 0,
                 (float)propulsionFrameWidth,
                 (float)propulsionFrameHeight
@@ -112,9 +177,8 @@ int main(void) {
 
     UnloadTexture(ship);
     UnloadTexture(shipPropulsionTex);
-
-    for (int i = 0; i < 2; i++)
-        UnloadTexture(asteroidTexs[i]);
+    for (int i = 0; i < 2; i++) UnloadTexture(asteroidTexs[i]);
+    UnloadTexture(starsTex);
 
     CloseWindow();
 
