@@ -167,6 +167,27 @@ int main(void) {
                 asteroids[i].speed = GetRandomValue(2, 5);
             }
 
+            if (CheckCollisionRecs(
+                Rectangle{ shipPos.x, shipPos.y, shipWidth, shipHeight },
+                Rectangle{
+                    asteroids[i].pos.x,
+                    asteroids[i].pos.y,
+                    asteroidTexs[asteroids[i].texIndex].width * asteroids[i].scale,
+                    asteroidTexs[asteroids[i].texIndex].height * asteroids[i].scale
+                }
+            )) {
+                shipPos.x = 50;
+                shipPos.y = screenHeight / 2 - shipWidth / 2;
+
+                for (int i = 0; i < maxAsteroids; i++) {
+                    asteroids[i].pos.x = screenWidth + 175 * i;
+                    asteroids[i].pos.y = GetRandomValue(0, screenHeight - 30);
+                    asteroids[i].texIndex = GetRandomValue(0, 1);
+                    asteroids[i].scale = GetRandomValue(2, 5);
+                    asteroids[i].speed = GetRandomValue(2, 5);
+                }
+            }
+
             DrawTextureEx(asteroidTexs[asteroids[i].texIndex], asteroids[i].pos, 0, asteroids[i].scale, RAYWHITE);
         }
 
